@@ -1,0 +1,10 @@
+kind: Service
+apiVersion: extensions/v1beta1
+metadata:
+  name: fluentd
+spec:
+  ports:
+    - port: 24224
+      targetPort: 24224
+  selector:
+    name: fluentd

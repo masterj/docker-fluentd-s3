@@ -1,0 +1,50 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  labels:
+    name: fluentd
+  name: fluentd
+spec:
+  template:
+    metadata:
+      labels:
+        version: v1
+    spec:
+      containers:
+        - name: fluent
+          image: fluent/fluentd
+          volumeMounts:
+          - name: varlibdockercontainers
+            mountPath: /containers
+            readOnly: true
+          - name: fluent-conf
+            readOnly: true
+            mountPath: /fluent/etc/
+          - name: fluent-pos
+            readOnly: false
+            mountPath: /var/log/
+          env:
+          - name: AWS_KID
+            value:
+          - name: AWS_KEY
+            value: 
+          - name: ES_HOST
+            value: elasticsearch.staging.svc.cluster.local
+          - name: NAMESPACE
+            value: default
+          - name: FLUENTD_CONF
+            value: fluent.conf
+          ports:
+          - containerPort: 24224
+            name: transport
+            protocol: TCP
+      volumes:
+        - name: varlibdockercontainers
+          hostPath:
+            path: /var/lib/docker/containers
+        - name: fluent-pos
+          hostPath:
+            path: /var/log/position
+        - name: fluent-conf
+          secret:
+            secretName: fluent-conf
